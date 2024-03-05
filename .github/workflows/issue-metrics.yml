@@ -24,6 +24,8 @@ jobs:
         
         # Echo the date range
         echo "$first_day..$last_day"
+
+        echo "hello there"
         
         # Set an environment variable with the date range for use in GitHub Actions
         echo "date_range=$first_day..$last_day" >> "$GITHUB_ENV"
