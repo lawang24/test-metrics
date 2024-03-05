@@ -1,8 +1,8 @@
-name: Monthly issue metrics
+name: Weekly PR metrics
 on:
   workflow_dispatch:
   schedule:
-    - cron: '20 22 1 * *'
+    - cron: '0 0 * * 1'
 
 permissions:
   issues: write
@@ -16,12 +16,13 @@ jobs:
     - name: Get dates for last month
       shell: bash
       run: |
-        # Set the first day to May 1
-        first_day="2024-03-01" # You might need to adjust the year accordingly
-          
-        # Set the last day to May 4
-        last_day="2024-03-07" # Again, ensure the year is correct for your needs
+      
+        # Calculate the first day as a week ago from the current date
+        first_day=$(date -d "1 week ago" +%Y-%m-%d)
         
+        # Calculate the last day as the current date
+        last_day=$(date +%Y-%m-%d)
+      
         # Echo the date range
         echo "$first_day..$last_day"
 
@@ -34,7 +35,7 @@ jobs:
       uses: lawang24/issue-metrics@v4
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SEARCH_QUERY: 'repo:lawang24/test-metrics is:pr'
+        SEARCH_QUERY: 'repo:lawang24/test-metrics is:pr is:closed'
 
     - name: Create issue
       uses: peter-evans/create-issue-from-file@v5
