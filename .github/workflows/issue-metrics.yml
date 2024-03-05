@@ -34,7 +34,7 @@ jobs:
       uses: lawang24/issue-metrics@v.1.0.0
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SEARCH_QUERY: 'repo:lawang24/test-metrics is:pr is:closed NOT add in:title'
+        SEARCH_QUERY: 'repo:lawang24/test-metrics is:pr'
 
     - name: Create issue
       uses: peter-evans/create-issue-from-file@v5
