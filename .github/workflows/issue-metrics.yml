@@ -31,7 +31,7 @@ jobs:
         echo "date_range=$first_day..$last_day" >> "$GITHUB_ENV"
 
     - name: Run issue-metrics tool
-      uses: github/issue-metrics@v2
+      uses: lawang24/issue-metrics@v.1.0.0
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SEARCH_QUERY: 'repo:lawang24/issue-metrics is:pr created:${{ env.date_range }} '
