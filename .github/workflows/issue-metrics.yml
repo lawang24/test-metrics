@@ -17,13 +17,15 @@ jobs:
       shell: bash
       run: |
         # Set the first day to May 1
-        first_day="2024-05-01" # You might need to adjust the year accordingly
-        
+        first_day="2024-03-01" # You might need to adjust the year accordingly
+          
         # Set the last day to May 4
-        last_day="2024-05-04" # Again, ensure the year is correct for your needs
+        last_day="2024-03-07" # Again, ensure the year is correct for your needs
         
         # Echo the date range
         echo "$first_day..$last_day"
+
+        echo "hello there"
         
         # Set an environment variable with the date range for use in GitHub Actions
         echo "date_range=$first_day..$last_day" >> "$GITHUB_ENV"
@@ -32,7 +34,7 @@ jobs:
       uses: github/issue-metrics@v2
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SEARCH_QUERY: 'repo:lawang24/issue-metrics is:pr created:${{ env.date_range }} -reason:"not planned"'
+        SEARCH_QUERY: 'repo:lawang24/issue-metrics is:pr created:${{ env.date_range }} '
 
     - name: Create issue
       uses: peter-evans/create-issue-from-file@v5
