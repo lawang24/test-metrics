@@ -34,7 +34,7 @@ jobs:
       uses: github/issue-metrics@v2
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SEARCH_QUERY: 'repo:lawang24/issue-metrics is:pr created:${{ env.date_range }} '
+        SEARCH_QUERY: 'repo:lawang24/issue-metrics created:2024-01-01..2024-06-01'
 
     - name: Create issue
       uses: peter-evans/create-issue-from-file@v5
