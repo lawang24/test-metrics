@@ -34,7 +34,7 @@ jobs:
     - name: Run issue-metrics tool
       uses: lawang24/issue-metrics@v5.0.2
       env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN_FINE }}
         SEARCH_QUERY: 'repo:durable-alpha/dsrc is:pr created:${{env.last_week}}'
 
     - name: Create issue
