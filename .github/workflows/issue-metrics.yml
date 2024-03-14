@@ -29,13 +29,13 @@ jobs:
         echo "hello there"
         
         # Set an environment variable with the date range for use in GitHub Actions
-        echo "date_range=$first_day..$last_day" >> "$GITHUB_ENV"
+        echo "last_week=$first_day..$last_day" >> "$GITHUB_ENV"
 
     - name: Run issue-metrics tool
       uses: lawang24/issue-metrics@v5.0.2
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        SEARCH_QUERY: 'repo:durable-alpha/dsrc is:pr'
+        SEARCH_QUERY: 'repo:durable-alpha/dsrc is:pr created:${{env.last_week}}'
 
     - name: Create issue
       uses: peter-evans/create-issue-from-file@v5
