@@ -36,10 +36,11 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN_FINE }}
         SEARCH_QUERY: 'repo:lawang24/test-metrics is:pr'
+        HIDE_TIME_TO_ANSWER: 'yes'
 
     - name: Create issue
       uses: peter-evans/create-issue-from-file@v5
       with:
-        title: ${{ env.date_range }} issue metrics report
+        title: ${{ env.last_week }} issue metrics report
         token: ${{ secrets.GITHUB_TOKEN }}
         content-filepath: ./issue_metrics.md
