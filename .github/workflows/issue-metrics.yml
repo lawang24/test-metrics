@@ -35,11 +35,11 @@ jobs:
       uses: lawang24/issue-metrics@v5.0.2
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN_FINE }}
-        SEARCH_QUERY: 'repo:durable-alpha/dsrc is:pr created:${{env.last_week}}'
+        SEARCH_QUERY: 'repo:lawang24/test-metrics is:pr'
 
     - name: Create issue
       uses: peter-evans/create-issue-from-file@v5
       with:
-        title: Monthly issue metrics report
+        title: ${{ env.date_range }} issue metrics report
         token: ${{ secrets.GITHUB_TOKEN }}
         content-filepath: ./issue_metrics.md
