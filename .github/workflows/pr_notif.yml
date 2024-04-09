@@ -41,10 +41,18 @@ jobs:
           for file in $CHANGED_FILES; do
               echo $file
               content_body=$( jq -n \
-                  --arg diff_log "$diff" \
-                  '{"model": "gpt-3.5-turbo", \
-                  "messages": [{"role": "user", "content": "Summarize the following code changes in a couple sentences or less: $diff_log"}], \
-                  "temperature": 0.7}') \
+                --arg file "$file" \
+                '{
+                  "model": "gpt-3.5-turbo",
+                  "messages": [
+                    {
+                      "role": "user",
+                      "content": ("Summarize the following list of changes:\n" + $file)
+                    }
+                  ],
+                  "temperature": 0.7
+                }')
+              echo "this is content body"
               echo $content_body
               diff=$(git diff HEAD^ HEAD -- "$file")
               echo $diff
