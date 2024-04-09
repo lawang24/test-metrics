@@ -63,12 +63,13 @@ jobs:
                               | jq -r '.choices[0].message.content')
               echo $response
               summaries+=("$response")
-          done
-          {
-          echo 'summaries<<EOF'
-          $(IFS=,; echo "${summaries[*]}")
-          echo EOF
-          } >> "$GITHUB_OUTPUT"
+            done
+            
+            {
+            echo 'summaries<<EOF'
+            echo $(IFS=,; echo "${summaries[*]}")
+            echo EOF
+            } >> "$GITHUB_OUTPUT"
 
       - name: Generate a final summary
         id: generate-final-summary
