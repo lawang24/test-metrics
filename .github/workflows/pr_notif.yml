@@ -38,6 +38,7 @@ jobs:
           summaries=()
           for file in $CHANGED_FILES; do
               diff=$(git diff "HEAD~5" "HEAD" -- "$file")
+              echo $file
               response=$(curl -s https://api.openai.com/v1/chat/completions \
                               -H "Content-Type: application/json" \
                               -H "Authorization: Bearer $GPT_API_KEY" \
