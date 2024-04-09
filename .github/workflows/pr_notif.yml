@@ -118,9 +118,12 @@ jobs:
         run: |
           echo "generating slack message"
           echo "$final_summary"
-          label_name=$(echo "${{github.event.pull_request.labels.*.name }}" | tr ',' '\n' | grep -E 'breaking|changelog' | head -n 1)
-          pr_number=$(echo "${{ github.event.pull_request.number }}")
-          pr_link=$(echo "${{ github.event.pull_request.html_url }}")
+          # label_name=$(echo "${{github.event.pull_request.labels.*.name }}" | tr ',' '\n' | grep -E 'breaking|changelog' | head -n 1)
+          label_name="breaking"
+          pr_number="1"
+          pr_link="2"
+          # pr_number=$(echo "${{ github.event.pull_request.number }}")
+          # pr_link=$(echo "${{ github.event.pull_request.html_url }}")
           main_url=https://github.com/durable-alpha/dsrc
           if [ "$label_name" = "breaking" ]; then
               title="There's been a *breaking change* (<$pr_link | PR \#$pr_number>) merged to <main|$main_url>."
