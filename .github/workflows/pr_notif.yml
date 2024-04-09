@@ -32,7 +32,7 @@ jobs:
       - name: Generate a summary for each changed file
         id: generate-summaries
         env:
-          CHANGED_FILES: ${{ steps.list-changed.output.CHANGED_FILES }}
+          CHANGED_FILES: ${{ steps.list-changed.outputs.CHANGED_FILES }}
           GPT_API_KEY: ${{ secrets.GPT_API_KEY }}
         shell: bash
         run: |
