@@ -1,5 +1,6 @@
 name: Slack notification summary of a PR merge labeled as breaking change or changelog
 on:
+  workflow_dispatch:
   pull_request:
     types: [closed]
     branches:
@@ -23,10 +24,9 @@ jobs:
         id: changed-files
         uses: tj-actions/changed-files@v41
         with:
-          base_sha: "HEAD~1"
+          base_sha: "HEAD ~5"
           files: |
-            **.ts
-            **.py
+            **.yml
 
       - name: List all changed files
         env:
@@ -44,7 +44,7 @@ jobs:
         run: |
           summaries=()
           for file in $CHANGED_FILES; do
-              diff=$(git diff "HEAD~1" "HEAD" -- "$file")
+              diff=$(git diff "HEAD~5" "HEAD" -- "$file")
               response=$(curl -s https://api.openai.com/v1/chat/completions \
                               -H "Content-Type: application/json" \
                               -H "Authorization: Bearer $GPT_API_KEY" \
