@@ -38,8 +38,10 @@ jobs:
         run: |
           summaries=()
           echo $CHANGED_FILES
+          
           for file in $CHANGED_FILES; do
               echo $file
+              diff=$(git diff HEAD^ HEAD -- "$file")
               content_body=$( jq -n \
                 --arg file "$file" \
                 '{
@@ -47,15 +49,13 @@ jobs:
                   "messages": [
                     {
                       "role": "user",
-                      "content": ("Summarize the following list of changes:\n" + $file)
+                      "content": ("Summarize the following list of changes:\n" + $diff)
                     }
                   ],
                   "temperature": 0.7
                 }')
-              echo "this is content body"
+              echo "This is the content body"
               echo $content_body
-              diff=$(git diff HEAD^ HEAD -- "$file")
-              echo $diff
               response=$(curl -s https://api.openai.com/v1/chat/completions \
                               -H "Content-Type: application/json" \
                               -H "Authorization: Bearer $GPT_API_KEY" \
@@ -64,7 +64,11 @@ jobs:
               echo $response
               summaries+=("$response")
           done
-          echo "summaries=$(IFS=,; echo "${summaries[*]}")" >> "$GITHUB_OUTPUT"
+          {
+          echo 'summaries<<EOF'
+          $(IFS=,; echo "${summaries[*]}
+          echo EOF
+          } >> "$GITHUB_OUTPUT"
 
       - name: Generate a final summary
         id: generate-final-summary
