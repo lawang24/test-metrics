@@ -40,16 +40,19 @@ jobs:
           echo $CHANGED_FILES
           for file in $CHANGED_FILES; do
               echo $file
+              content_body=$( jq -n \
+                  --arg diff_log "$diff" \
+                  '{"model": "gpt-3.5-turbo", \
+                  "messages": [{"role": "user", "content": "Summarize the following code changes in a couple sentences or less: $diff_log"}], \
+                  "temperature": 0.7}') \
+              echo $content_body
               diff=$(git diff HEAD^ HEAD -- "$file")
               echo $diff
               response=$(curl -s https://api.openai.com/v1/chat/completions \
                               -H "Content-Type: application/json" \
                               -H "Authorization: Bearer $GPT_API_KEY" \
-                              -d '{
-                                 "model": "gpt-3.5-turbo",
-                                 "messages": [{"role": "user", "content": "Summarize the following code changes in a couple sentences or less:\n $diff"}],
-                                 "temperature": 0.7
-                               }' | jq -r '.choices[0].message.content')
+                              -d "$content_body" \
+                              | jq -r '.choices[0].message.content')
               echo $response
               summaries+=("$response")
           done
