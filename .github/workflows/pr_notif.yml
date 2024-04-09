@@ -26,7 +26,7 @@ jobs:
         shell: bash
         run: |
           echo "List all the files that have changed: $CHANGED_FILES"
-          echo "{CHANGED_FILES}={$CHANGED_FILES}" >> "$GITHUB_OUTPUT"
+          echo "CHANGED_FILES=$CHANGED_FILES" >> "$GITHUB_OUTPUT"
 
       # https://platform.openai.com/docs/api-reference/making-requests
       - name: Generate a summary for each changed file
@@ -37,6 +37,7 @@ jobs:
         shell: bash
         run: |
           summaries=()
+          echo $CHANGED_FILES
           for file in $CHANGED_FILES; do
               diff=$(git diff "HEAD~5" "HEAD" -- "$file")
               echo $file
@@ -51,7 +52,7 @@ jobs:
               echo $response
               summaries+=("$response")
           done
-          echo "{summaries}={$(IFS=,; echo "${summaries[*]}"})}" >> "$GITHUB_OUTPUT"
+          echo "summaries=$(IFS=,; echo "${summaries[*]}"})" >> "$GITHUB_OUTPUT"
 
       - name: Generate a final summary
         id: generate-final-summary
@@ -70,7 +71,7 @@ jobs:
                                  "temperature": 0.7
                                }' | jq -r '.choices[0].message.content')
           echo $response
-          echo "{final_summary}={"$response"}" >> "$GITHUB_OUTPUT"
+          echo "final_summary=$response" >> "$GITHUB_OUTPUT"
 
       # https://api.slack.com/messaging/webhooks
       # https://api.slack.com/block-kit
