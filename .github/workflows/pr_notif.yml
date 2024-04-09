@@ -53,7 +53,7 @@ jobs:
               echo $response
               summaries+=("$response")
           done
-          echo "summaries=$(IFS=,; echo "${summaries[*]}"})" >> "$GITHUB_OUTPUT"
+          echo "summaries=$(IFS=,; echo "${summaries[*]}")" >> "$GITHUB_OUTPUT"
 
       - name: Generate a final summary
         id: generate-final-summary
@@ -68,7 +68,7 @@ jobs:
                               -H "Authorization: Bearer $GPT_API_KEY" \
                               -d '{
                                  "model": "gpt-3.5-turbo",
-                                 "messages": [{"role": "user", "content": "Summarize the following list of changes: $summaries"}],
+                                 "messages": [{"role": "user", "content": "Summarize the following comma-separated list of changes:\n $summaries"}],
                                  "temperature": 0.7
                                }' | jq -r '.choices[0].message.content')
           echo $response
