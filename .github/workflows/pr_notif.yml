@@ -26,6 +26,7 @@ jobs:
         shell: bash
         run: |
           echo "List all the files that have changed: $CHANGED_FILES"
+          echo "{CHANGED_FILES}={$CHANGED_FILES}" >> "$GITHUB_OUTPUT"
 
       # https://platform.openai.com/docs/api-reference/making-requests
       - name: Generate a summary for each changed file
