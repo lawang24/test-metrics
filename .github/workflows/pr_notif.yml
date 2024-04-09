@@ -117,7 +117,7 @@ jobs:
         shell: bash
         run: |
           echo "generating slack message"
-          echo $final_summary
+          echo "$final_summary"
           label_name=$(echo "${{github.event.pull_request.labels.*.name }}" | tr ',' '\n' | grep -E 'breaking|changelog' | head -n 1)
           pr_number=$(echo "${{ github.event.pull_request.number }}")
           pr_link=$(echo "${{ github.event.pull_request.html_url }}")
@@ -127,7 +127,19 @@ jobs:
           else
               title="There's been a *changelog update* (<$pr_link | PR \#$pr_number>) merged to <main|$main_url>."
           fi
-          body="$final_summary"
-          slack_message="{\"blocks\": [{\"type\": \"section\", \"text\": {\"type\": \"mrkdwn\", \"text\": \"$title\\n\\n$body\"}}]}"
+          slack_message=$(jq -n \
+                      --arg title "$title" \
+                      --arg final_summary "$final_summary" \
+                      '{
+                        blocks: [
+                          {
+                            type: "section",
+                            text: {
+                              type: "mrkdwn",
+                              text: ($title + "\n\n" + $final_summary)
+                            }
+                          }
+                        ]
+                      }')
           echo "posting summary to slack"
           curl -X POST -H 'Content-type: application/json' --data "$slack_message" $SLACK_WEBHOOK
