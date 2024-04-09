@@ -14,22 +14,15 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 2
 
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      - name: Get diff
-        id: changed-files
-        uses: tj-actions/changed-files@v41
-        with:
-          base_sha: "HEAD ~5"
-          files: |
-            **.yml
 
       - name: List all changed files
         env:
-          CHANGED_FILES: ${{steps.changed-files.outputs.all_changed_files }}
+          CHANGED_FILES: "pr_notif.yml pr_notif.yml"
         shell: bash
         run: |
           echo "List all the files that have changed: $CHANGED_FILES"
