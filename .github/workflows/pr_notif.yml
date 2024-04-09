@@ -19,8 +19,8 @@ jobs:
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
-
       - name: List all changed files
+        id: list-changed
         env:
           CHANGED_FILES: "pr_notif.yml pr_notif.yml"
         shell: bash
@@ -32,6 +32,7 @@ jobs:
       - name: Generate a summary for each changed file
         id: generate-summaries
         env:
+          CHANGED_FILES: ${{ steps.list-changed.output.CHANGED_FILES }}
           GPT_API_KEY: ${{ secrets.GPT_API_KEY }}
         shell: bash
         run: |
