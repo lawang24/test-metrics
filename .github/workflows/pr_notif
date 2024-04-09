@@ -1,0 +1,101 @@
+name: Slack notification summary of a PR merge labeled as breaking change or changelog
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  notifySlack:
+    if: github.event.pull_request.merged && (contains(github.event.pull_request.labels.*.name, 'breaking') || contains(github.event.pull_request.labels.*.name, 'changelog'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Get diff
+        id: changed-files
+        uses: tj-actions/changed-files@v41
+        with:
+          base_sha: "HEAD~1"
+          files: |
+            **.ts
+            **.py
+
+      - name: List all changed files
+        env:
+          CHANGED_FILES: ${{steps.changed-files.outputs.all_changed_files }}
+        shell: bash
+        run: |
+          echo "List all the files that have changed: $CHANGED_FILES"
+
+      # https://platform.openai.com/docs/api-reference/making-requests
+      - name: Generate a summary for each changed file
+        id: generate-summaries
+        env:
+          GPT_API_KEY: ${{ secrets.GPT_API_KEY }}
+        shell: bash
+        run: |
+          summaries=()
+          for file in $CHANGED_FILES; do
+              diff=$(git diff "HEAD~1" "HEAD" -- "$file")
+              response=$(curl -s https://api.openai.com/v1/chat/completions \
+                              -H "Content-Type: application/json" \
+                              -H "Authorization: Bearer $GPT_API_KEY" \
+                              -d '{
+                                 "model": "gpt-3.5-turbo",
+                                 "messages": [{"role": "user", "content": "Summarize the following code changes in a couple sentences or less:\n'"$diff"'"}],
+                                 "temperature": 0.7
+                               }' | jq -r '.choices[0].message.content')
+              echo $response
+              summaries+=("$response")
+          done
+          echo "{summaries}={$(IFS=,; echo "${summaries[*]}"})}" >> "$GITHUB_OUTPUT"
+
+      - name: Generate a final summary
+        id: generate-final-summary
+        env:
+          GPT_API_KEY: ${{ secrets.GPT_API_KEY }}
+        shell: bash
+        run: |
+          summaries=$(echo "${{ steps.generate-summaries.outputs.summaries }}")
+          echo $summaries
+          response=$(curl -s https://api.openai.com/v1/chat/completions \
+                              -H "Content-Type: application/json" \
+                              -H "Authorization: Bearer $GPT_API_KEY" \
+                              -d '{
+                                 "model": "gpt-3.5-turbo",
+                                 "messages": [{"role": "user", "content": "Summarize the following list of changes: '"$summaries"'"}],
+                                 "temperature": 0.7
+                               }' | jq -r '.choices[0].message.content')
+          echo $response
+          echo "{final_summary}={"$response"}" >> "$GITHUB_OUTPUT"
+
+      # https://api.slack.com/messaging/webhooks
+      # https://api.slack.com/block-kit
+      - name: Send Slack notification
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        shell: bash
+        run: |
+          echo "generating slack message"
+          final_summary=$(echo "${{steps.generate-final-summary.outputs.final_summary }}")
+          label_name=$(echo "${{github.event.pull_request.labels.*.name }}" | tr ',' '\n' | grep -E 'breaking|changelog' | head -n 1)
+          pr_number=$(echo "${{ github.event.pull_request.number }}")
+          pr_link=$(echo "${{ github.event.pull_request.html_url }}")
+          main_url=https://github.com/durable-alpha/dsrc
+          if [ "$label_name" = "breaking" ]; then
+              title="There's been a *breaking change* (<$pr_link | PR \#$pr_number>) merged to <main|$main_url>."
+          else
+              title="There's been a *changelog update* (<$pr_link | PR \#$pr_number>) merged to <main|$main_url>."
+          fi
+          body="$final_summary"
+          slack_message="{\"blocks\": [{\"type\": \"section\", \"text\": {\"type\": \"mrkdwn\", \"text\": \"$title\\n\\n$body\"}}]}"
+          echo "posting summary to slack"
+          curl -X POST -H 'Content-type: application/json' --data "$slack_message" $SLACK_WEBHOOK
