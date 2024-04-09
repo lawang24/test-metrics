@@ -59,16 +59,16 @@ jobs:
         id: generate-final-summary
         env:
           GPT_API_KEY: ${{ secrets.GPT_API_KEY }}
+          summaries: ${{ steps.generate-summaries.outputs.summaries }}
         shell: bash
         run: |
-          summaries=$(echo "${{ steps.generate-summaries.outputs.summaries }}")
           echo $summaries
           response=$(curl -s https://api.openai.com/v1/chat/completions \
                               -H "Content-Type: application/json" \
                               -H "Authorization: Bearer $GPT_API_KEY" \
                               -d '{
                                  "model": "gpt-3.5-turbo",
-                                 "messages": [{"role": "user", "content": "Summarize the following list of changes: '"$summaries"'"}],
+                                 "messages": [{"role": "user", "content": "Summarize the following list of changes: $summaries"}],
                                  "temperature": 0.7
                                }' | jq -r '.choices[0].message.content')
           echo $response
@@ -79,10 +79,12 @@ jobs:
       - name: Send Slack notification
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          final_summary: ${{steps.generate-final-summary.outputs.final_summary }}
+          
         shell: bash
         run: |
           echo "generating slack message"
-          final_summary=$(echo "${{steps.generate-final-summary.outputs.final_summary }}")
+          echo $final_summary
           label_name=$(echo "${{github.event.pull_request.labels.*.name }}" | tr ',' '\n' | grep -E 'breaking|changelog' | head -n 1)
           pr_number=$(echo "${{ github.event.pull_request.number }}")
           pr_link=$(echo "${{ github.event.pull_request.html_url }}")
