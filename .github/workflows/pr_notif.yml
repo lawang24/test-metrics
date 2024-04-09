@@ -43,7 +43,7 @@ jobs:
               echo $file
               diff=$(git diff HEAD^ HEAD -- "$file")
               content_body=$( jq -n \
-                --arg file "$file" \
+                --arg diff "$diff" \
                 '{
                   "model": "gpt-3.5-turbo",
                   "messages": [
