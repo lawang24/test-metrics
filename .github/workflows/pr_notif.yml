@@ -22,7 +22,7 @@ jobs:
       - name: List all changed files
         id: list-changed
         env:
-          CHANGED_FILES: "pr_notif.yml pr_notif.yml"
+          CHANGED_FILES: ".github/workflows/pr_notif.yml .github/workflows/pr_notif.yml"
         shell: bash
         run: |
           echo "List all the files that have changed: $CHANGED_FILES"
@@ -39,8 +39,8 @@ jobs:
           summaries=()
           echo $CHANGED_FILES
           for file in $CHANGED_FILES; do
-              diff=$(git diff "HEAD~5" "HEAD" -- "$file")
               echo $file
+              diff=$(git diff HEAD^ HEAD -- "$file")
               response=$(curl -s https://api.openai.com/v1/chat/completions \
                               -H "Content-Type: application/json" \
                               -H "Authorization: Bearer $GPT_API_KEY" \
