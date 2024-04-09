@@ -49,7 +49,7 @@ jobs:
                   "messages": [
                     {
                       "role": "user",
-                      "content": ("Summarize the following list of changes:\n" + $diff)
+                      "content": ("Summarize the following code changes in a couple sentences or less:\n" + $diff)
                     }
                   ],
                   "temperature": 0.7
@@ -64,7 +64,8 @@ jobs:
               echo $response
               summaries+=("$response")
             done
-            
+
+            # multiline output format
             {
             echo 'summaries<<EOF'
             echo $(IFS=,; echo "${summaries[*]}")
@@ -79,17 +80,32 @@ jobs:
         shell: bash
         run: |
           echo $summaries
-          content=$summaries
+          content_body=$( jq -n \
+                --arg summaries "$summaries" \
+                '{
+                  "model": "gpt-3.5-turbo",
+                  "messages": [
+                    {
+                      "role": "user",
+                      "content": ("Summarize the following list of changes:\n" + $summaries)
+                    }
+                  ],
+                  "temperature": 0.7
+                }')
+
           response=$(curl -s https://api.openai.com/v1/chat/completions \
                               -H "Content-Type: application/json" \
                               -H "Authorization: Bearer $GPT_API_KEY" \
-                              -d '{
-                                 "model": "gpt-3.5-turbo",
-                                 "messages": [{"role": "user", "content": "Repeat this back to me: $content"}],
-                                 "temperature": 0.7
-                               }' | jq -r '.choices[0].message.content')
+                              -d "$content_body" \
+                              | jq -r '.choices[0].message.content')
           echo $response
-          echo "final_summary=$response" >> "$GITHUB_OUTPUT"
+          
+          # multiline output format
+           {
+            echo 'final_summary<<EOF'
+            echo $response
+            echo EOF
+            } >> "$GITHUB_OUTPUT"
 
       # https://api.slack.com/messaging/webhooks
       # https://api.slack.com/block-kit
