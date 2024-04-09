@@ -8,7 +8,6 @@ on:
 
 jobs:
   notifySlack:
-    if: github.event.pull_request.merged && (contains(github.event.pull_request.labels.*.name, 'breaking') || contains(github.event.pull_request.labels.*.name, 'changelog'))
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
