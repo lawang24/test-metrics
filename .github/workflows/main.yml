@@ -15,8 +15,8 @@ jobs:
       - name: Send Slack notification
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          breaking_label: ${{contains('breaking'), 'breaking'}}
-          bad: ${{contains('poop'), 'breaking'}}
+          breaking_label: ${{contains('breaking', 'breaking')}}
+          bad: ${{contains('poop', 'breaking')}}
           
         shell: bash
         run: |
