@@ -1,0 +1,23 @@
+name: test_github
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  notifySlack:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      # https://api.slack.com/block-kit
+      - name: Send Slack notification
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          breaking_label: ${{contains("breaking"), "breaking"}}
+        shell: bash
+        run: |
+          echo "generating slack message"
+          echo $breaking_label
+          
