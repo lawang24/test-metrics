@@ -15,11 +15,15 @@ jobs:
       - name: Send Slack notification
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          breaking_label: ${{contains('breaking', 'breaking')}}
+          breaking_label: ${{contains(github.event.pull_request.labels.*.name, 'breaking')}}
           bad: ${{contains('poop', 'breaking')}}
           
         shell: bash
         run: |
           echo "generating slack message"
-          echo $breaking_label
-          echo $bad
+          if [ "$breaking_label" = true ] ; then
+              echo "hello it works"
+          else
+              echo "woops"
+          fi
+          
