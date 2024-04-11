@@ -20,11 +20,20 @@ jobs:
         if: env.FINAL_SUMMARY
         run: |
          echo "This willasdfasdfjklasd fj run"
+         echo 'FINAL_SUMMARY<<EOF'
+          echo "hello!
+          echo EOF
+          } >> "$GITHUB_ENV"
       
       - name: Test null case Body
         if: ${{!env.FINAL_SUMMARY}}
         run: |
-          echo "This will run"
-          echo $final_summary
+          echo "This shouldn't runrun"
+          echo $FINAL_SUMMARY
+          
+      - name: Test rewrite
+        run: echo $FINAL_SUMMARY
+        
+          
       
           
