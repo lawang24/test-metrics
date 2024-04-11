@@ -14,14 +14,11 @@ jobs:
       # https://api.slack.com/block-kit
       - name: Send Slack notification
         env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           breaking_label: ${{contains(github.event.pull_request.labels.*.name, 'breaking')}}
-          bad: ${{contains('poop', 'breaking')}}
-          payload: ${{github.event.pull_request}}
+          payload: ${{github.event.pull_request.body}}
           
         shell: bash
         run: |
-          echo "${{github.event.pull_request}}"
           echo "$payload"
           echo "generating slack message"
           if [ "$breaking_label" = true ] ; then
