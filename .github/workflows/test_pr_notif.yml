@@ -22,7 +22,7 @@ jobs:
          echo "This willasdfasdfjklasd fj run"
           {
           echo 'FINAL_SUMMARY<<EOF'
-          echo "hello!
+          echo "hello!"
           echo EOF
           } >> "$GITHUB_ENV"
       
