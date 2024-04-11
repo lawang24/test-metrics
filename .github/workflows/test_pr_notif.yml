@@ -6,29 +6,23 @@ on:
     branches:
       - main
 
+# for security reasons? supposed to keep body as env. var
+env: 
+  FINAL_SUMMARY: ${{github.event.pull_request.body}}
+
 jobs:
   notifySlack:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      # https://api.slack.com/block-kit
-      - name: Send Slack notification
-        shell: bash
-        run: |
-          # multiline output format
-          {
-          echo 'final_summary<<EOF'
-          echo "${{github.event.pull_request.body}}"
-          echo EOF
-          } >> "$GITHUB_ENV"
 
-      - name: Test Empty Body
-        if: final_summary
+      - name: Test pos case Body
+        if: env.FINAL_SUMMARY
         run: |
-         echo "This will not run"
+         echo "This willasdfasdfjklasd fj run"
       
-      - name: Test full Body
-        if: final_summary
+      - name: Test null case Body
+        if: ${{!env.FINAL_SUMMARY}}
         run: |
           echo "This will run"
           echo $final_summary
