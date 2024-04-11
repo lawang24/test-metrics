@@ -20,7 +20,8 @@ jobs:
         if: env.FINAL_SUMMARY
         run: |
          echo "This willasdfasdfjklasd fj run"
-         echo 'FINAL_SUMMARY<<EOF'
+          {
+          echo 'FINAL_SUMMARY<<EOF'
           echo "hello!
           echo EOF
           } >> "$GITHUB_ENV"
