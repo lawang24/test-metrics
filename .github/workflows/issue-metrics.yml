@@ -1,8 +1,6 @@
 name: Weekly PR metrics
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '*/5 * * * *'
 
 permissions:
   issues: write
