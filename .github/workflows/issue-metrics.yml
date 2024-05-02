@@ -32,7 +32,7 @@ jobs:
         echo "last_week=$first_day..$last_day" >> "$GITHUB_ENV"
 
     - name: Run issue-metrics tool
-      uses: lawang24/issue-metrics@v6.03
+      uses: lawang24/issue-metrics@v6.04
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SEARCH_QUERY: 'repo:lawang24/test-metrics is:pr'
